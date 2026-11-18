@@ -22,6 +22,7 @@ load_dotenv()
 GROQ_MODEL = "openai/gpt-oss-120b"
 
 
+
 @st.cache_resource
 def get_groq_client() -> Optional[Groq]:
     """Create and cache the Groq client from GROQ_API_KEY."""
@@ -181,11 +182,113 @@ def main():
         layout="wide",
         initial_sidebar_state="expanded",
     )
-    st.markdown('<div class="main-header">📄 AI Invoice & Receipt Extractor</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Upload PDF invoices/receipts, extract key fields with AI, and export to Excel or CSV</div>', unsafe_allow_html=True)
-    
+
+    # --- Custom CSS: hide default Streamlit chrome, style hero, cards, buttons, metrics ---
+    st.markdown(
+        """
+        <style>
+        /* Hide default Streamlit header / toolbar / footer */
+        [data-testid="stAppHeader"],
+        [data-testid="stToolbar"],
+        [data-testid="stFooter"],
+        header[data-testid="stHeader"],
+        footer[data-testid="stFooter"] {
+            display: none !important;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            text-align: center;
+            padding: 80px 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.25);
+        }
+        .hero-gradient h1 {
+            margin-bottom: 12px;
+            font-size: 2.4rem;
+        }
+        .hero-gradient p {
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-top: 0;
+            opacity: 0.95;
+        }
+
+        .app-card {
+            border-radius: 14px;
+            border: 1px solid rgba(109, 142, 247, 0.18);
+            box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+            padding: 22px;
+            margin-bottom: 22px;
+            background-color: #ffffff;
+        }
+        .app-card-title {
+            margin-top: 0;
+            margin-bottom: 14px;
+            font-size: 1.25rem;
+        }
+
+        .btn-rounded-full {
+            width: 100%;
+            border-radius: 14px !important;
+        }
+        .btn-rounded-full button {
+            border-radius: 14px !important;
+            width: 100% !important;
+        }
+
+        .metric-card, .stMetric {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid rgba(109, 142, 247, 0.15);
+            box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+            padding: 18px;
+            text-align: center;
+        }
+
+        /* Rounded, full-width, hover-enabled buttons */
+        .stButton>button, .stDownloadButton>button {
+            border-radius: 14px !important;
+            width: 100% !important;
+            transition: all 0.25s ease;
+        }
+        .stButton>button:hover, .stDownloadButton>button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(109, 142, 247, 0.35);
+        }
+
+        /* Rounded cards for Streamlit widgets & outputs */
+        .stFileUploader, .stDataFrame, .stExpander, .stAlert, .stProgress {
+            border-radius: 14px !important;
+            border: 1px solid rgba(109, 142, 247, 0.18) !important;
+            box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06) !important;
+        }
+        .stFileUploader, .stDataFrame, .stExpander {
+            background-color: #ffffff !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # --- Gradient Hero Banner ---
+    st.markdown(
+        """
+        <div class="hero-gradient">
+            <h1>AI Invoice &amp; Receipt Extractor</h1>
+            <p>Upload PDF invoices/receipts, extract key fields via Groq API (openai/gpt-oss-120b), view results in an interactive table, and download as Excel or CSV.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown('<div class="main-content">', unsafe_allow_html=True)
     with st.sidebar:
-        st.header("⚙️ Settings")
+        st.markdown('<div class="app-card">', unsafe_allow_html=True)
+        st.markdown('<h2 class="app-card-title">⚙️ Settings</h2>', unsafe_allow_html=True)
         client = get_groq_client()
         if client:
             st.success("✅ Groq API connected")
@@ -193,7 +296,7 @@ def main():
             st.error("❌ GROQ_API_KEY not found in .env")
             st.info("Add your Groq API key to `.env` file")
         st.divider()
-        st.header("📋 Extraction Fields")
+        st.markdown('<h2 class="app-card-title">📋 Extraction Fields</h2>', unsafe_allow_html=True)
         st.markdown("""
 - **Vendor Name**
 - **Invoice Number**
@@ -206,6 +309,7 @@ def main():
         """)
         st.divider()
         st.caption(f"Model: `{GROQ_MODEL}`")
+        st.markdown('</div>', unsafe_allow_html=True)
     
     if not client:
         st.stop()
@@ -310,6 +414,7 @@ def main():
                 mime="text/csv",
                 use_container_width=True,
             )
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
